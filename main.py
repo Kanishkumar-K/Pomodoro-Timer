@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import timedelta
 import time
-from beeply import notes  # Import the beeply library for beep sound
+import platform
 
 # Set initial values
 work_duration = 25  # in minutes
@@ -59,7 +59,15 @@ while is_running and time_remaining.total_seconds() > 0:
     if time_remaining.total_seconds() <= 0:
         st.balloons()
         st.success("Session complete! Take a break.")
-        notes('C', 1)  # Add an alarm beep sound
+        
+        # Play a beep sound
+        if platform.system() == "Windows":
+            import winsound
+            winsound.Beep(1000, 1000)  # Frequency: 1000 Hz, Duration: 1000 ms
+        elif platform.system() == "Darwin":  # Mac
+            import os
+            os.system('afplay /System/Library/Sounds/Ping.aiff')
+        
         is_running = False
         is_break = True
         time_remaining = timedelta(minutes=break_duration)
