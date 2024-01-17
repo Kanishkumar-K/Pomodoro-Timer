@@ -1,10 +1,12 @@
 import streamlit as st
 from datetime import timedelta
 import time
-import pyttsx3
+from gtts import gTTS
+import pygame
+from io import BytesIO
 
-# Initialize pyttsx3 for text-to-speech
-engine = pyttsx3.init()
+# Initialize pygame for sound
+pygame.init()
 
 # Set initial values
 work_duration = 25  # in minutes
@@ -63,9 +65,12 @@ while is_running and time_remaining.total_seconds() > 0:
         st.balloons()
         st.success("Session complete! Take a break.")
         
-        # Add an audio alarm using pyttsx3
-        engine.say("Session complete! Take a break.")
-        engine.runAndWait()
+        # Add an audio alarm using gTTS
+        tts = gTTS(text="Session complete! Take a break.", lang="en")
+        audio_bytes = BytesIO()
+        tts.write_to_fp(audio_bytes)
+        audio_bytes.seek(0)
+        pygame.mixer.Sound(audio_bytes).play()
         
         is_running = False
         is_break = True
