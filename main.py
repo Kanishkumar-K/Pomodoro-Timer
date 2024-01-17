@@ -1,10 +1,10 @@
 import streamlit as st
 from datetime import timedelta
 import time
-import pygame
+import pyttsx3
 
-# Initialize pygame for sound
-pygame.init()
+# Initialize pyttsx3 for text-to-speech
+engine = pyttsx3.init()
 
 # Set initial values
 work_duration = 25  # in minutes
@@ -62,7 +62,11 @@ while is_running and time_remaining.total_seconds() > 0:
     if time_remaining.total_seconds() <= 0:
         st.balloons()
         st.success("Session complete! Take a break.")
-        pygame.mixer.Sound("alarm.mp3").play()  # Add an alarm sound
+        
+        # Add an audio alarm using pyttsx3
+        engine.say("Session complete! Take a break.")
+        engine.runAndWait()
+        
         is_running = False
         is_break = True
         time_remaining = timedelta(minutes=break_duration)
@@ -70,13 +74,13 @@ while is_running and time_remaining.total_seconds() > 0:
 # Break indicator and continue button
 if is_break:
     st.warning("Break time! Take a moment to relax.")
-    if st.button("Continue to next work session", key="continue_button"):
+    if st.button("Continue to the next work session", key="continue_button"):
         is_break = False
         is_running = True
         start_time = time.time()
         time_remaining = timedelta(minutes=work_duration)
 
-# Display final time when stopped
+# Display the final time when stopped
 if not is_running and not is_break:
     minutes, seconds = divmod(int(time_remaining.total_seconds()), 60)
     time_display.markdown(f"<h1 style='text-align: center; color: #1f68c0;'>{minutes:02d}:{seconds:02d}</h1>",
