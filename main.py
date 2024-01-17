@@ -1,12 +1,7 @@
 import streamlit as st
 from datetime import timedelta
 import time
-from gtts import gTTS
-import pygame
-from io import BytesIO
-
-# Initialize pygame for sound
-pygame.init()
+from beeply import notes  # Import the beeply library for beep sound
 
 # Set initial values
 work_duration = 25  # in minutes
@@ -64,14 +59,7 @@ while is_running and time_remaining.total_seconds() > 0:
     if time_remaining.total_seconds() <= 0:
         st.balloons()
         st.success("Session complete! Take a break.")
-        
-        # Add an audio alarm using gTTS
-        tts = gTTS(text="Session complete! Take a break.", lang="en")
-        audio_bytes = BytesIO()
-        tts.write_to_fp(audio_bytes)
-        audio_bytes.seek(0)
-        pygame.mixer.Sound(audio_bytes).play()
-        
+        notes('C', 1)  # Add an alarm beep sound
         is_running = False
         is_break = True
         time_remaining = timedelta(minutes=break_duration)
@@ -79,13 +67,13 @@ while is_running and time_remaining.total_seconds() > 0:
 # Break indicator and continue button
 if is_break:
     st.warning("Break time! Take a moment to relax.")
-    if st.button("Continue to the next work session", key="continue_button"):
+    if st.button("Continue to next work session", key="continue_button"):
         is_break = False
         is_running = True
         start_time = time.time()
         time_remaining = timedelta(minutes=work_duration)
 
-# Display the final time when stopped
+# Display final time when stopped
 if not is_running and not is_break:
     minutes, seconds = divmod(int(time_remaining.total_seconds()), 60)
     time_display.markdown(f"<h1 style='text-align: center; color: #1f68c0;'>{minutes:02d}:{seconds:02d}</h1>",
